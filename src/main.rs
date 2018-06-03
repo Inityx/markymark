@@ -13,6 +13,11 @@ const SENTENCE_DELIMITERS: &str = ".?!";
 fn sentence_end(c: char) -> bool { SENTENCE_DELIMITERS.contains(c) }
 
 fn main() {
+    if env::args().nth(1).is_none() {
+        eprintln!("Usage: markymark file1 [file2]...");
+        return;
+    }
+
     eprintln!("Reading files...");
     let sources: Vec<_> = env::args()
         .skip(1)
@@ -24,7 +29,9 @@ fn main() {
 
     eprintln!("Training chain...");
     let begin = time::Instant::now();
+
     for source in &sources { markov.train_text(source, sentence_end); }
+
     let duration = begin.elapsed();
     let (contexts, links) = markov.num_contexts_links();
     eprintln!(
